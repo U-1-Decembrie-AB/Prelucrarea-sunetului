@@ -1,0 +1,48 @@
+import librosa
+import librosa.display
+import matplotlib.pyplot as plt
+import numpy as np
+from IPython.display import Audio, display
+
+# Lista cu fișierele audio
+audio_files = ["funky.wav", "good-afternoon.wav", "shuff89.wav", "mrsandman.wav"]
+
+# Parcurgem fiecare fișier și efectuăm operațiile de procesare
+for file in audio_files:
+    print(f"Procesare fișier: {file}")
+    
+    # Încărcăm fișierul audio
+    # sr=None permite menținerea ratei de eșantionare originală a fișierului
+    y, sr = librosa.load(file, sr=None)
+    duration = len(y) / sr
+    print(f"Rata de eșantionare: {sr} Hz; Durata: {duration:.2f} secunde")
+    
+    # Redare audio (în mediile Jupyter Notebook)
+    print("Redare audio:")
+    display(Audio(data=y, rate=sr))
+    
+    # Vizualizarea formei de undă a semnalului audio
+    plt.figure(figsize=(14, 4))
+    librosa.display.waveshow(y, sr=sr)
+    plt.title(f"Formă de undă - {file}")
+    plt.xlabel("Timp (secunde)")
+    plt.ylabel("Amplitudine")
+    plt.tight_layout()
+    plt.show()
+    
+    # Calculul transformatei Fourier pe termen scurt (STFT)
+    D = librosa.stft(y)
+    # Conversia amplitudinilor în scale de decibeli
+    DB = librosa.amplitude_to_db(np.abs(D), ref=np.max)
+    
+    # Vizualizarea spectrogramei
+    plt.figure(figsize=(14, 4))
+    librosa.display.specshow(DB, sr=sr, x_axis='time', y_axis='hz', cmap='viridis')
+    plt.colorbar(format="%+2.0f dB")
+    plt.title(f"Spectrogramă - {file}")
+    plt.xlabel("Timp (secunde)")
+    plt.ylabel("Frecvență (Hz)")
+    plt.tight_layout()
+    plt.show()
+    
+    print("\n" + "="*60 + "\n")
